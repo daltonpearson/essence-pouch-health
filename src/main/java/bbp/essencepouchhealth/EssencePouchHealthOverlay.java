@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2018, Seth <http://github.com/sethtroll>
+ * Copyright (c) 2023, Truth Forger <http://github.com/Blackberry0Pie>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,7 +23,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.example;
+package bbp.essencepouchhealth;
 
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.ui.overlay.WidgetItemOverlay;
@@ -31,12 +32,12 @@ import net.runelite.client.ui.overlay.components.TextComponent;
 import javax.inject.Inject;
 import java.awt.*;
 
-class RCPouchOverlay extends WidgetItemOverlay
+class EssencePouchHealthOverlay extends WidgetItemOverlay
 {
-    private final PouchUsageLeft plugin;
+    private final EssencePouchHealthPlugin plugin;
 
     @Inject
-    private RCPouchOverlay(PouchUsageLeft plugin)
+    private EssencePouchHealthOverlay(EssencePouchHealthPlugin plugin)
     {
         showOnInventory();
         this.plugin = plugin;

@@ -22,7 +22,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.example;
+package bbp.essencepouchhealth;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
@@ -49,7 +49,7 @@ import java.util.Map;
 @PluginDescriptor(
 	name = "Runecrafting counter"
 )
-public class PouchUsageLeft extends Plugin
+public class EssencePouchHealthPlugin extends Plugin
 {
 	private static final int SPELL_CONTACT_ANIMATION_ID = 4413;
 
@@ -64,14 +64,14 @@ public class PouchUsageLeft extends Plugin
 	private static final int COLOSSAL_POUCH_USES = 8*40;
 
 	@Getter
-	private Map<Integer, Integer> itemUses = new HashMap<Integer, Integer>() {{
-			put(MED_POUCH, 0);
-			put(LARGE_POUCH, 0);
-			put(GIANT_POUCH, 0);
-			put(COLOSSAL_POUCH, 0);
+	private Map<Integer, Integer> itemUses = new HashMap<>() {{
+		put(MED_POUCH, 0);
+		put(LARGE_POUCH, 0);
+		put(GIANT_POUCH, 0);
+		put(COLOSSAL_POUCH, 0);
 	}};
 
-	public final Map<Integer, Integer> maxItemUses = new HashMap<Integer, Integer>() {{
+	public final Map<Integer, Integer> maxItemUses = new HashMap<>() {{
 		put(MED_POUCH, MED_POUCH_USES);
 		put(LARGE_POUCH, LARGE_POUCH_USES);
 		put(GIANT_POUCH, GIANT_POUCH_USES);
@@ -86,7 +86,7 @@ public class PouchUsageLeft extends Plugin
 	@Inject
 	private OverlayManager overlayManager;
 	@Inject
-	private RCPouchOverlay rcOverlay;
+	private EssencePouchHealthOverlay rcOverlay;
 	@Inject
 	private ItemManager itemManager;
 
@@ -163,13 +163,15 @@ public class PouchUsageLeft extends Plugin
 		if (event.getMenuOption() == null || !event.getMenuOption().equals("Fill")) {
 			return;
 		}
-		int inventoryIndex = event.getActionParam();
+		int inventoryIndex = event.getParam0();
 		final int itemId;
 		final String itemName;
 
-		if (event.getWidgetId() == WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId()) {
+		if (event.getParam1() == WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId()) {
 			ItemContainer inventoryContainer = client.getItemContainer(InventoryID.INVENTORY);
 			Item item = inventoryContainer.getItem(inventoryIndex);
+			if (item == null)
+				return;
 			itemId = item.getId();
 			itemName = item.toString();
 		} else {
