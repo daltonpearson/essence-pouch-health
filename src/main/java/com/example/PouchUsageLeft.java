@@ -27,17 +27,13 @@ package com.example;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
-import com.google.inject.Provides;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.AnimationChanged;
-import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.WidgetInfo;
-import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
@@ -57,7 +53,6 @@ public class PouchUsageLeft extends Plugin
 {
 	private static final int SPELL_CONTACT_ANIMATION_ID = 4413;
 
-	private static final int[] AREAS_CLOSE_TO_ZMI = {9778, 12119};
 	private static final int MED_POUCH = ItemID.MEDIUM_POUCH;
 	private static final int LARGE_POUCH = ItemID.LARGE_POUCH;
 	private static final int GIANT_POUCH = ItemID.GIANT_POUCH;
@@ -85,9 +80,6 @@ public class PouchUsageLeft extends Plugin
 
 	private Multiset<Integer> previousInventorySnapshot;
 	private int lastClickedItem = -1;
-
-	@Getter
-	private boolean isClose = false;
 
 	@Inject
 	private Client client;
@@ -129,29 +121,6 @@ public class PouchUsageLeft extends Plugin
 			itemUses.replaceAll((k, v) -> 0);
 		}
 
-	}
-
-	@Subscribe
-	public void onGameTick(GameTick tick) {
-
-		isClose = isCloseToZMI();
-	}
-
-	private boolean isCloseToZMI()
-	{
-		Player local = client.getLocalPlayer();
-		if (local == null)
-		{
-			return false;
-		}
-
-		WorldPoint location = local.getWorldLocation();
-		//log.info("RegionID: {}", location.getRegionID());
-		for (int area : AREAS_CLOSE_TO_ZMI) {
-			if (location.getRegionID() == area)
-				return true;
-		}
-		return false;
 	}
 
 	private Multiset<Integer> getInventorySnapshot()
