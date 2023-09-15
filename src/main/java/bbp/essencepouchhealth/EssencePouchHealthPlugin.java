@@ -27,6 +27,8 @@ package bbp.essencepouchhealth;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
+import java.util.List;
+import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
@@ -49,26 +51,30 @@ import java.util.Map;
 )
 public class EssencePouchHealthPlugin extends Plugin
 {
-	private static final int MED_POUCH = ItemID.MEDIUM_POUCH;
+	private static final int MEDIUM_POUCH = ItemID.MEDIUM_POUCH;
 	private static final int LARGE_POUCH = ItemID.LARGE_POUCH;
 	private static final int GIANT_POUCH = ItemID.GIANT_POUCH;
 	private static final int COLOSSAL_POUCH = ItemID.COLOSSAL_POUCH;
 
-	private static final int MED_POUCH_USES = 44*6;
-	private static final int LARGE_POUCH_USES = 31*9;
-	private static final int GIANT_POUCH_USES = 10*12;
-	private static final int COLOSSAL_POUCH_USES = 8*40;
+	private static final int MEDIUM_POUCH_USES = 44*6; //264
+	private static final int LARGE_POUCH_USES = 31*9; //279
+	private static final int GIANT_POUCH_USES = 10*12; //120
+	private static final int COLOSSAL_POUCH_USES = 8*40; //320
+
+	private static final List<Integer> healthyPouchList = List.of(MEDIUM_POUCH, LARGE_POUCH, GIANT_POUCH, COLOSSAL_POUCH);
+	private static final List<Integer> degradedPouchList = List.of(ItemID.MEDIUM_POUCH_5511, ItemID.LARGE_POUCH_5513, ItemID.GIANT_POUCH_5515, ItemID.COLOSSAL_POUCH_26786 /* TODO check if this is not the quest pouch id */);
+	private static final List<Integer> essenceList = List.of(ItemID.DAEYALT_ESSENCE, ItemID.PURE_ESSENCE, ItemID.GUARDIAN_ESSENCE);
 
 	@Getter
 	private Map<Integer, Integer> itemUses = new HashMap<>() {{
-		put(MED_POUCH, 0);
+		put(MEDIUM_POUCH, 0);
 		put(LARGE_POUCH, 0);
 		put(GIANT_POUCH, 0);
 		put(COLOSSAL_POUCH, 0);
 	}};
 
-	public final Map<Integer, Integer> maxItemUses = new HashMap<>() {{
-		put(MED_POUCH, MED_POUCH_USES);
+	protected final Map<Integer, Integer> maxItemUses = new HashMap<>() {{
+		put(MEDIUM_POUCH, MEDIUM_POUCH_USES);
 		put(LARGE_POUCH, LARGE_POUCH_USES);
 		put(GIANT_POUCH, GIANT_POUCH_USES);
 		put(COLOSSAL_POUCH, COLOSSAL_POUCH_USES);
@@ -90,6 +96,7 @@ public class EssencePouchHealthPlugin extends Plugin
 	protected void startUp() throws Exception
 	{
 		overlayManager.add(rcOverlay);
+		previousInventorySnapshot = getInventorySnapshot(); //TODO test if this works
 	}
 
 	@Override
@@ -113,7 +120,6 @@ public class EssencePouchHealthPlugin extends Plugin
 	@Subscribe
 	public void onItemContainerChanged(ItemContainerChanged event)
 	{
-
 		if (previousInventorySnapshot == null) return;
 		if (lastClickedItem == -1) return;
 		Multiset<Integer> currentInventorySnapshot = getInventorySnapshot();
@@ -123,9 +129,24 @@ public class EssencePouchHealthPlugin extends Plugin
 			return;
 		}
 
-		int removedItemCount = (int)itemsRemoved.stream().filter(k -> k == ItemID.DAEYALT_ESSENCE || k == ItemID.PURE_ESSENCE || k == ItemID.GUARDIAN_ESSENCE).count();
-		log.info("Stored {} items", removedItemCount);
-		itemUses.put(lastClickedItem, itemUses.get(lastClickedItem)+removedItemCount);
+		int removedEssenceCount = (int)itemsRemoved.stream().filter(essenceList::contains).count();
+		if (removedEssenceCount > 0 ) {
+			log.info("Stored {} items", removedEssenceCount);
+			itemUses.put(lastClickedItem, itemUses.get(lastClickedItem) + removedEssenceCount);
+		}
+
+		Stream<Integer> degradedPouchesRemoved = itemsRemoved.stream().filter(degradedPouchList::contains);
+		if (degradedPouchesRemoved.findAny().isPresent()) {
+			final Multiset<Integer> itemsAdded = Multisets.difference(currentInventorySnapshot, previousInventorySnapshot);
+			if ((int)itemsAdded.stream().filter(healthyPouchList::contains).count() > 0) {
+				//Repair all pouches
+				itemUses.put(MEDIUM_POUCH, MEDIUM_POUCH_USES);
+				itemUses.put(LARGE_POUCH, LARGE_POUCH_USES);
+				itemUses.put(GIANT_POUCH, GIANT_POUCH_USES);
+				itemUses.put(COLOSSAL_POUCH, COLOSSAL_POUCH_USES);
+			}
+		}
+
 		lastClickedItem = -1;
 	}
 
@@ -141,6 +162,8 @@ public class EssencePouchHealthPlugin extends Plugin
 		final String itemName;
 
 		ItemContainer inventoryContainer = client.getItemContainer(InventoryID.INVENTORY);
+		if (inventoryContainer == null)
+			return;
 		Item item = inventoryContainer.getItem(inventoryIndex);
 		if (item == null)
 			return;
