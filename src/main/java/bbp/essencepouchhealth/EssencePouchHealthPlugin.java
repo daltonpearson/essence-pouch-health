@@ -30,10 +30,8 @@ import com.google.common.collect.Multisets;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
-import net.runelite.api.events.AnimationChanged;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.MenuOptionClicked;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
@@ -51,8 +49,6 @@ import java.util.Map;
 )
 public class EssencePouchHealthPlugin extends Plugin
 {
-	private static final int SPELL_CONTACT_ANIMATION_ID = 4413;
-
 	private static final int MED_POUCH = ItemID.MEDIUM_POUCH;
 	private static final int LARGE_POUCH = ItemID.LARGE_POUCH;
 	private static final int GIANT_POUCH = ItemID.GIANT_POUCH;
@@ -101,28 +97,6 @@ public class EssencePouchHealthPlugin extends Plugin
 		overlayManager.remove(rcOverlay);
 	}
 
-	@Subscribe
-	public void onAnimationChanged(AnimationChanged event)
-	{
-		if (client.getLocalPlayer() == null || client.getLocalPlayer().getName() == null)
-		{
-			return;
-		}
-
-		String playerName = client.getLocalPlayer().getName();
-		String actorName = event.getActor().getName();
-
-		if (!playerName.equals(actorName)) {
-			return;
-		}
-
-		int animId = event.getActor().getAnimation();
-		if (animId == SPELL_CONTACT_ANIMATION_ID) {
-			itemUses.replaceAll((k, v) -> 0);
-		}
-
-	}
-
 	private Multiset<Integer> getInventorySnapshot()
 	{
 		final ItemContainer inventory = client.getItemContainer(InventoryID.INVENTORY);
@@ -148,7 +122,6 @@ public class EssencePouchHealthPlugin extends Plugin
 			log.info("Did not actually fill anything...");
 			return;
 		}
-
 
 		int removedItemCount = (int)itemsRemoved.stream().filter(k -> k == ItemID.DAEYALT_ESSENCE || k == ItemID.PURE_ESSENCE || k == ItemID.GUARDIAN_ESSENCE).count();
 		log.info("Stored {} items", removedItemCount);
