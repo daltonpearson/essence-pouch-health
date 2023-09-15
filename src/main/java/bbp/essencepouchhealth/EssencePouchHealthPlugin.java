@@ -115,7 +115,7 @@ public class EssencePouchHealthPlugin extends Plugin
 	protected void startUp() throws Exception
 	{
 		overlayManager.add(rcOverlay);
-		previousInventorySnapshot = getInventorySnapshot(); //TODO test if this works
+		previousInventorySnapshot = getInventorySnapshot();
 	}
 
 	@Override
@@ -166,10 +166,10 @@ public class EssencePouchHealthPlugin extends Plugin
 			final Multiset<Integer> itemsAdded = Multisets.difference(currentInventorySnapshot, previousInventorySnapshot);
 			if ((int)itemsAdded.stream().filter(healthyPouchList::contains).count() > 0) {
 				//Repair all pouches
-				itemUses.put(MEDIUM_POUCH, MEDIUM_POUCH_USES);
-				itemUses.put(LARGE_POUCH, LARGE_POUCH_USES);
-				itemUses.put(GIANT_POUCH, GIANT_POUCH_USES);
-				itemUses.put(COLOSSAL_POUCH, COLOSSAL_POUCH_USES);
+				itemUses.put(MEDIUM_POUCH, 0);
+				itemUses.put(LARGE_POUCH, 0);
+				itemUses.put(GIANT_POUCH, 0);
+				itemUses.put(COLOSSAL_POUCH, 0);
 			}
 		}
 
