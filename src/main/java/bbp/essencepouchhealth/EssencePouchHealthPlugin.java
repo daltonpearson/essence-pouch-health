@@ -48,7 +48,10 @@ import java.util.Map;
 
 @Slf4j
 @PluginDescriptor(
-	name = "Runecrafting counter"
+		name = "Essence Pouch Health",
+		description = "Shows how much essence you can put into your pouches before it degrades.",
+		tags = {"rc", "runecraft", "runecrafting", "pouch", "rune", "essence", "degrade"},
+		enabledByDefault = false
 )
 public class EssencePouchHealthPlugin extends Plugin
 {
@@ -85,7 +88,7 @@ public class EssencePouchHealthPlugin extends Plugin
 		put(COLOSSAL_POUCH, COLOSSAL_POUCH_USES);
 	}};
 
-	private final Map<Integer, Integer> pouchSize = new HashMap<Integer, Integer>() {{
+	private final Map<Integer, Integer> pouchSize = new HashMap<>() {{
 		put(SMALL_POUCH, 3);
 		put(MEDIUM_POUCH, 6);
 		put(LARGE_POUCH, 9);
@@ -94,7 +97,7 @@ public class EssencePouchHealthPlugin extends Plugin
 	}};
 
 	//Ordered list of which pouches were filled on a tick to deduct from max capacity
-	public ArrayList<Integer> filledPouches = new ArrayList<Integer>();
+	public ArrayList<Integer> filledPouches = new ArrayList<>();
 
 	private Multiset<Integer> previousInventorySnapshot;
 	private int lastClickedItem = -1;
@@ -198,10 +201,12 @@ public class EssencePouchHealthPlugin extends Plugin
 			filledPouches.add(itemId);
 		}
 		log.info("Filled pouches: {}", filledPouches);
+
 		if (!itemUses.containsKey(itemId)) {
 			log.info("Filled an item that we don't know about: {} with ID: {}", itemName, itemId);
 			return;
 		}
+
 		previousInventorySnapshot = getInventorySnapshot();
 		lastClickedItem = itemId;
 	}
