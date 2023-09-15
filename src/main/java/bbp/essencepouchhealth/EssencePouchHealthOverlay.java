@@ -53,15 +53,18 @@ class EssencePouchHealthOverlay extends WidgetItemOverlay
         final TextComponent textComponent = new TextComponent();
         textComponent.setPosition(new Point(bounds.x - 1, bounds.y + bounds.height));
 
-        int usesLeft = this.plugin.maxItemUses.get(itemId) - this.plugin.getItemUses().get(itemId);
+        int usesLeft = this.plugin.getMaxItemUses().get(itemId) - this.plugin.getItemUses().get(itemId);
         if (usesLeft > 12) {
             textComponent.setColor(Color.WHITE);
         } else {
             textComponent.setColor(Color.RED);
         }
 
-        textComponent.setText(Integer.toString(usesLeft));
+        //Prevent rendering of usage counter on Small Pouch
+        if (usesLeft > 0) {
+            textComponent.setText(Integer.toString(usesLeft));
 
-        textComponent.render(graphics);
+            textComponent.render(graphics);
+        }
     }
 }
