@@ -50,8 +50,7 @@ import java.util.Map;
 @PluginDescriptor(
 		name = "Essence Pouch Health",
 		description = "Shows how much essence you can put into your pouches before it degrades.",
-		tags = {"rc", "runecraft", "runecrafting", "pouch", "rune", "essence", "degrade"},
-		enabledByDefault = false
+		tags = {"rc", "runecraft", "runecrafting", "pouch", "rune", "essence", "degrade"}
 )
 public class EssencePouchHealthPlugin extends Plugin
 {
