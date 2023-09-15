@@ -140,18 +140,12 @@ public class EssencePouchHealthPlugin extends Plugin
 		final int itemId;
 		final String itemName;
 
-		if (event.getParam1() == WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId()) {
-			ItemContainer inventoryContainer = client.getItemContainer(InventoryID.INVENTORY);
-			Item item = inventoryContainer.getItem(inventoryIndex);
-			if (item == null)
-				return;
-			itemId = item.getId();
-			itemName = item.toString();
-		} else {
-			final ItemComposition itemComposition = itemManager.getItemComposition(event.getId());
-			itemId = itemComposition.getId();
-			itemName = itemComposition.getName();
-		}
+		ItemContainer inventoryContainer = client.getItemContainer(InventoryID.INVENTORY);
+		Item item = inventoryContainer.getItem(inventoryIndex);
+		if (item == null)
+			return;
+		itemId = item.getId();
+		itemName = item.toString();
 
 		if (!itemUses.containsKey(itemId)) {
 			log.info("Filled an item that we don't know about: {} with ID: {}", itemName, itemId);
