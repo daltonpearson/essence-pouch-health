@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
+import net.runelite.api.events.AnimationChanged;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.client.eventbus.Subscribe;
@@ -54,6 +55,7 @@ import java.util.Map;
 )
 public class EssencePouchHealthPlugin extends Plugin
 {
+	private static final int SPELL_CONTACT_ANIMATION_ID = 4413;
 	private static final int SMALL_POUCH = ItemID.SMALL_POUCH;
 	private static final int MEDIUM_POUCH = ItemID.MEDIUM_POUCH;
 	private static final int LARGE_POUCH = ItemID.LARGE_POUCH;
@@ -134,6 +136,29 @@ public class EssencePouchHealthPlugin extends Plugin
 		}
 
 		return inventorySnapshot;
+	}
+	@Subscribe
+	public void onAnimationChanged(AnimationChanged event)
+	{
+		if (client.getLocalPlayer() == null || client.getLocalPlayer().getName() == null)
+		{
+			return;
+		}
+
+		String playerName = client.getLocalPlayer().getName();
+		String actorName = event.getActor().getName();
+
+		if (!playerName.equals(actorName))
+		{
+			return;
+		}
+
+		int animId = event.getActor().getAnimation();
+		if (animId == SPELL_CONTACT_ANIMATION_ID)
+		{
+			itemUses.replaceAll((k, v) -> 0);
+		}
+
 	}
 	@Subscribe
 	public void onItemContainerChanged(ItemContainerChanged event)
